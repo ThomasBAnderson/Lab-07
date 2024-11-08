@@ -1,6 +1,6 @@
 ---
 title: "Lab 07 - Modelling course evaluations"
-author: "INSERT NAME HERE"
+author: "Thomas Anderson"
 date: "`r Sys.Date()`"
 output: html_document
 ---
@@ -24,15 +24,27 @@ evals<-read.csv("data/evals.csv", row.names=1)
 1.  Visualize the distribution of `score` in the dataframe `evals`.
 
 ```{r viz-score}
-# add code here
+
+ggplot(data = evals, aes(x = score), na.rm = TRUE) +
+         geom_histogram() +
+         labs(x = "Score Rating", y = NULL)
+
+
 ```
 
-*Add your other details and narratives here.*
+The data is skewed towards the upper limits of Score Rating with more courses rated between around 4.6 than lower rated around 3. This tells us students are more likely to rate courses at a higher rating. This is what I expected as people tend to rate things higher than what they truly think.
 
 2.  Visualize and describe the relationship between `score` and `bty_avg` using `geom_point()` to represent the data. 
 
 ```{r scatterplot}
-# add code here
+
+ggplot(data = evals, aes(x = score, y = bty_avg)) +
+  geom_jitter() +
+  geom_smooth(method = "lm") +
+  labs(x = "Score",
+       y = "Average"
+       )
+
 ```
 
 *Add your narrative and other details here.*
@@ -41,24 +53,36 @@ evals<-read.csv("data/evals.csv", row.names=1)
 
 1. Fit a linear model called `score_bty_fit` to predict average professor evaluation `score` from average beauty rating (`bty_avg`). Print the regression output using `tidy()`.
 
-```{r fit-score_bty_fit, eval = FALSE}
-# remove eval = FALSE from the code chunk options after filling in the blanks
+```{r fit-score_bty_fit}
+
 score_bty_fit <- linear_reg() %>%
   set_engine("lm") %>%
-  fit(___ ~ ___, data = ___)
+  fit(score ~ bty_avg, data = evals)
+
+
 ```
 
-```{r tidy-score_bty_fit, eval = FALSE}
+```{r tidy-score_bty_fit}
 # remove eval = FALSE from the code chunk options after filling in the blanks
-tidy(___)
+tidy(score_bty_fit)
 ```
 
-*Add your linear model here. Don't worry too much about notation, you can use things like score-hat.*
+Score = 3.88 + 0.067 x bty_avg
 
 2. Plot the data again using `geom_jitter()`, and add the regression line.
 
 ```{r viz-score_bty_fit,eval=FALSE}
 # add your plot here. Hint, you can add the regression line using geom_smooth()
+
+score_bty_fit <- augment(score_bty_fit$fit)
+
+ggplot(score_bty_fit, mapping = aes(x = .fitted, y = .resid)) +
+  geom_jitter() +
+  geom_hline(yintercept = 0, color = "red")
+  
+
+
+
 ```
 
 3. Interpret the slope of the linear model in context of the data.
